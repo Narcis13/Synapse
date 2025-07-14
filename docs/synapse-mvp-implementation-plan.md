@@ -148,7 +148,7 @@
   - Contact support link
   ```
 
-- [ ] **1.8 Implement landing page**
+- [x] **1.8 Implement landing page**
   ```typescript
   // src/app/(marketing)/page.tsx
   import { Hero } from "@/components/marketing/Hero"
