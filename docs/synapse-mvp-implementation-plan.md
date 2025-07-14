@@ -25,7 +25,7 @@
   npx create-next-app@latest . --typescript --tailwind --app
   ```
 
-- [ ] **1.2 Install core dependencies**
+- [x] **1.2 Install core dependencies**
   ```bash
   # Core dependencies
   npm install convex ai @ai-sdk/openai zod
@@ -47,7 +47,7 @@
   npm install --save-dev @types/node
   ```
 
-- [ ] **1.3 Setup shadcn/ui**
+- [x] **1.3 Setup shadcn/ui**
   ```bash
   npx shadcn-ui@latest init
   # Choose: TypeScript, Yes for CSS variables, default for everything else
@@ -65,7 +65,7 @@
   ```bash
   npx convex dev
   # Choose "create a new project"
-  # Name it "synapse-mvp"
+  # Name it "synapse"
   ```
 
 - [ ] **1.5 Configure environment variables**
