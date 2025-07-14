@@ -163,7 +163,7 @@
   - Social links
   ```
 
-- [ ] **2.1 Create comprehensive Convex schema**
+- [x] **2.1 Create comprehensive Convex schema**
   ```typescript
   // convex/schema.ts
   import { defineSchema, defineTable } from "convex/server";
