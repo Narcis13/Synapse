@@ -1,7 +1,11 @@
+import Hero from "@/components/marketing/Hero";
+import Features from "@/components/marketing/Features";
+
 export default function MarketingPage() {
   return (
-    <div>
-      <h1>Welcome to Synapse</h1>
-    </div>
+    <main>
+      <Hero />
+      <Features />
+    </main>
   );
 }

@@ -124,7 +124,7 @@
   └── hooks/
   ```
 
-- [ ] **1.7 Create marketing site components**
+- [x] **1.7 Create marketing site components**
   ```typescript
   // src/components/marketing/Hero.tsx
   - Animated hero section with value prop
