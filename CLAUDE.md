@@ -102,3 +102,7 @@ DEEPGRAM_API_KEY
 - Treat implementation plan in /docs/implementation-plan.md as a living document. Update checkboxes as tasks are completed and add new tasks as discovered
 - **IMPORTANT**: When you are asked to implement a task from /docs/implementation-plan.md implement only that task nothink more nothing less!
 - **CRITICAL**: ALWAYS update the implementation plan IMMEDIATELY after completing any task. Mark completed tasks with [x] by editing the /docs/synapse-mvp-implementation-plan.md file. This is MANDATORY - never skip this step!
+
+## Memory Notes
+
+- Always use context7 mcp server

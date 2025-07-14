@@ -61,14 +61,14 @@
   npx shadcn-ui@latest add navigation-menu accordion
   ```
 
-- [ ] **1.4 Setup Convex**
+- [x] **1.4 Setup Convex**
   ```bash
   npx convex dev
   # Choose "create a new project"
   # Name it "synapse"
   ```
 
-- [ ] **1.5 Configure environment variables**
+- [x] **1.5 Configure environment variables**
   ```bash
   # Create .env.local
   OPENAI_API_KEY=your_key_here
@@ -79,7 +79,7 @@
   DEEPGRAM_API_KEY=your_deepgram_key
   ```
 
-- [ ] **1.6 Setup folder structure**
+- [x] **1.6 Setup folder structure**
   ```
   src/
   ├── app/
