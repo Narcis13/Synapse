@@ -30,31 +30,39 @@ export default defineSchema({
     .index("by_stripe_customer_id", ["subscription.stripeCustomerId"]),
 
   documents: defineTable({
+    userId: v.id("users"),
     title: v.string(),
-    fileType: v.union(
-      v.literal("pdf"), 
-      v.literal("txt"), 
-      v.literal("md"),
-      v.literal("audio")
-    ),
-    storageId: v.id("_storage"),
-    transcriptId: v.optional(v.id("_storage")), // For audio files
+    fileType: v.string(), // MIME type
+    fileSize: v.number(), // in bytes
+    storageId: v.string(), // Will be empty during upload
     status: v.union(
-      v.literal("pending"),
+      v.literal("uploading"),
+      v.literal("uploaded"),
       v.literal("processing"),
       v.literal("completed"),
       v.literal("failed")
     ),
-    metadata: v.object({
-      size: v.number(),
-      duration: v.optional(v.number()), // For audio
-      pageCount: v.optional(v.number()), // For PDFs
-      language: v.optional(v.string()),
-    }),
-    uploadedBy: v.id("users"),
-    createdAt: v.number(),
-  }).index("by_status", ["status"])
-    .index("by_user", ["uploadedBy"]),
+    uploadedAt: v.number(),
+    processed: v.boolean(),
+    content: v.string(), // Extracted text content
+    summary: v.optional(v.string()),
+    flashcards: v.array(v.object({
+      question: v.string(),
+      answer: v.string(),
+    })),
+    quiz: v.optional(v.object({
+      questions: v.array(v.object({
+        question: v.string(),
+        options: v.array(v.string()),
+        correctAnswer: v.number(),
+        explanation: v.string(),
+      })),
+    })),
+    transcript: v.optional(v.string()), // For audio files
+    audioDuration: v.optional(v.number()), // in seconds
+    error: v.optional(v.string()),
+  }).index("by_user", ["userId"])
+    .index("by_status", ["status"]),
 
   documentChunks: defineTable({
     documentId: v.id("documents"),

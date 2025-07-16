@@ -303,7 +303,7 @@
   });
   ```
 
-- [ ] **2.2 Implement authentication with subscription checks**
+- [x] **2.2 Implement authentication with subscription checks**
   ```typescript
   // convex/auth.ts
   export const register = mutation({
@@ -328,7 +328,7 @@
   })
   ```
 
-- [ ] **2.3 Setup Stripe integration**
+- [x] **2.3 Setup Stripe integration**
   ```typescript
   // src/lib/stripe.ts
   import Stripe from 'stripe'
@@ -340,7 +340,7 @@
   // Update subscription status
   ```
 
-- [ ] **2.4 Create enhanced pricing page**
+- [x] **2.4 Create enhanced pricing page**
   ```typescript
   // src/app/(marketing)/pricing/page.tsx
   import { Card } from "@/components/ui/card"
@@ -356,7 +356,7 @@
   - Testimonials from paid users
   ```
 
-- [ ] **2.5 Implement Stripe webhook handler**
+- [x] **2.5 Implement Stripe webhook handler**
   ```typescript
   // src/app/api/stripe/webhook/route.ts
   - Handle subscription created
@@ -365,7 +365,7 @@
   - Update user record in Convex
   ```
 
-- [ ] **2.6 Create additional marketing pages**
+- [x] **2.6 Create additional marketing pages**
   ```typescript
   // src/app/(marketing)/features/page.tsx
   - Detailed feature explanations
@@ -392,7 +392,7 @@
   - Response time expectations
   ```
 
-- [ ] **3.1 Create enhanced file upload component**
+- [x] **3.1 Create enhanced file upload component**
   ```typescript
   // src/components/documents/FileUpload.tsx
   import { Card } from "@/components/ui/card"
@@ -405,7 +405,7 @@
   - Audio file preview with duration
   ```
 
-- [ ] **3.2 Implement audio recording component**
+- [x] **3.2 Implement audio recording component**
   ```typescript
   // src/components/audio/AudioRecorder.tsx
   import { Button } from "@/components/ui/button"
@@ -417,7 +417,7 @@
   - Save as voice memo
   ```
 
-- [ ] **3.3 Update Convex file storage for audio**
+- [x] **3.3 Update Convex file storage for audio**
   ```typescript
   // convex/documents.ts
   export const generateUploadUrl = mutation({
@@ -432,7 +432,7 @@
   })
   ```
 
-- [ ] **3.4 Create document management table**
+- [x] **3.4 Create document management table**
   ```typescript
   // src/components/documents/DocumentsTable.tsx
   import { Table } from "@/components/ui/table"
@@ -444,7 +444,7 @@
   - Actions dropdown menu
   ```
 
-- [ ] **3.5 Create legal pages**
+- [x] **3.5 Create legal pages**
   ```typescript
   // src/app/(marketing)/privacy/page.tsx
   - Data collection policies
@@ -461,7 +461,7 @@
   - Subscription terms
   ```
 
-- [ ] **3.6 Implement navigation and footer**
+- [x] **3.6 Implement navigation and footer**
   ```typescript
   // src/components/marketing/Navigation.tsx
   import { NavigationMenu } from "@/components/ui/navigation-menu"

@@ -1,9 +1,9 @@
 import { Metadata } from "next";
-import { Hero } from "@/components/marketing/Hero";
-import { Features } from "@/components/marketing/Features";
-import { Testimonials } from "@/components/marketing/Testimonials";
+import Hero from "@/components/marketing/Hero";
+import Features from "@/components/marketing/Features";
+import Testimonials from "@/components/marketing/Testimonials";
 import { PricingSection } from "@/components/marketing/PricingSection";
-import { FAQ } from "@/components/marketing/FAQ";
+import FAQ from "@/components/marketing/FAQ";
 import { NewsletterSignup } from "@/components/marketing/NewsletterSignup";
 import { PerformanceMetrics } from "@/components/marketing/PerformanceMetrics";
 import { SocialLinks } from "@/components/marketing/SocialLinks";

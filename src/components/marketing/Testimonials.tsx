@@ -26,6 +26,7 @@ import {
   Shield,
   CheckCircle,
   ArrowRight,
+  Trophy,
 } from "lucide-react";
 
 interface Testimonial {
