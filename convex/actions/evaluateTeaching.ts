@@ -21,9 +21,30 @@ export const evaluateExplanation = action({
       content: v.string()
     })))
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{
+    evaluation: {
+      accuracy: number;
+      clarity: number;
+      completeness: number;
+      overallScore: number;
+      misconceptions: string[];
+      missingConcepts: string[];
+      strengths: string[];
+    };
+    studentResponse: {
+      type: "question" | "feedback" | "encouragement" | "clarification" | "confusion";
+      content: string;
+      personality: string;
+      mood: "excited" | "confused" | "thoughtful" | "interested";
+    };
+    sessionUpdate: {
+      comprehensionScore: number;
+      questionsAnswered: number;
+      totalQuestions: number;
+    };
+  }> => {
     // Fetch the session details
-    const session = await ctx.runQuery(api.documents.getTeachMeSession, {
+    const session: any = await ctx.runQuery(api.documents.getTeachMeSession, {
       sessionId: args.sessionId
     })
     
@@ -39,8 +60,8 @@ export const evaluateExplanation = action({
     )
     
     const sourceMaterial = sourceChunks
-      .filter(chunk => chunk !== null)
-      .map(chunk => chunk!.content)
+      .filter((chunk): chunk is NonNullable<typeof chunk> => chunk !== null)
+      .map(chunk => chunk.content)
       .join("\n\n")
 
     // Get the AI student personality
@@ -115,7 +136,7 @@ Previous conversation for context:
 ${args.conversationHistory?.map(msg => `${msg.role}: ${msg.content}`).join("\n") || "No previous messages"}
 `
 
-      const studentResponse = await openai.chat.completions.create({
+      const studentResponse: OpenAI.Chat.ChatCompletion = await openai.chat.completions.create({
         model: "gpt-4-turbo-preview",
         messages: [
           {
@@ -131,7 +152,7 @@ ${args.conversationHistory?.map(msg => `${msg.role}: ${msg.content}`).join("\n")
         max_tokens: 300,
       })
 
-      const aiResponse = studentResponse.choices[0].message.content || 
+      const aiResponse: string = studentResponse.choices[0].message.content || 
         getRandomResponse(personality, "confusion")
 
       // Determine response type based on evaluation
@@ -248,8 +269,11 @@ export const generateFollowUpQuestion = action({
     recentExplanation: v.string(),
     comprehensionLevel: v.number()
   },
-  handler: async (ctx, args) => {
-    const session = await ctx.runQuery(api.documents.getTeachMeSession, {
+  handler: async (ctx, args): Promise<{
+    question: string;
+    type: "advanced" | "clarification" | "understanding";
+  }> => {
+    const session: any = await ctx.runQuery(api.documents.getTeachMeSession, {
       sessionId: args.sessionId
     })
     
@@ -273,7 +297,7 @@ Generate a follow-up question that:
 `
 
     try {
-      const response = await openai.chat.completions.create({
+      const response: OpenAI.Chat.ChatCompletion = await openai.chat.completions.create({
         model: "gpt-4-turbo-preview",
         messages: [
           {
@@ -289,7 +313,7 @@ Generate a follow-up question that:
         max_tokens: 150,
       })
 
-      const question = response.choices[0].message.content || 
+      const question: string = response.choices[0].message.content || 
         getRandomResponse(personality, "followUp")
 
       await ctx.runMutation(api.documents.addTeachMeConversation, {

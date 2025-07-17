@@ -71,7 +71,7 @@ export const generateTeachMeScript = action({
       // Combine chunks to get full content (limit to first 10 chunks for initial analysis)
       const contentForAnalysis = chunks
         .slice(0, 10)
-        .map(chunk => chunk.content)
+        .map((chunk: any) => chunk.content)
         .join("\n\n")
 
       // Step 1: Analyze document for key concepts

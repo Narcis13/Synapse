@@ -217,7 +217,7 @@ export const getCurrentUser = internalQuery({
 
     return await ctx.db
       .query("users")
-      .withIndex("by_email", (q) => q.eq("email", identity.email))
+      .withIndex("by_email", (q) => q.eq("email", identity.email!))
       .first()
   },
 })

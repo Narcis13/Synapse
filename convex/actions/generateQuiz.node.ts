@@ -79,7 +79,7 @@ export const generateQuiz = action({
       const includeTimestamps = isAudioDocument && (args.includeTimestamps !== false)
 
       // Prepare chunks with timestamp information for audio
-      const chunksWithTimestamps = chunks.map(chunk => ({
+      const chunksWithTimestamps = chunks.map((chunk: any) => ({
         content: chunk.content,
         startTime: chunk.metadata?.startTime,
         endTime: chunk.metadata?.endTime,
@@ -93,7 +93,7 @@ export const generateQuiz = action({
 
       // Combine content for analysis
       const contentForAnalysis = selectedChunks
-        .map((chunk, index) => {
+        .map((chunk: any, index: number) => {
           if (includeTimestamps && chunk.hasTimestamp) {
             const timeLabel = `[${formatTimestamp(chunk.startTime!)} - ${formatTimestamp(chunk.endTime!)}]`
             return `${timeLabel}\n${chunk.content}`

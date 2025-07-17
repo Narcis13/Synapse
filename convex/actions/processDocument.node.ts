@@ -3,7 +3,8 @@
 import { v } from "convex/values"
 import { action } from "../_generated/server"
 import { internal } from "../_generated/api"
-import { openai, embedMany } from "@ai-sdk/openai"
+import { openai } from "@ai-sdk/openai"
+import { embedMany } from "ai"
 import pdf from 'pdf-parse'
 import { createClient } from '@deepgram/sdk'
 
@@ -261,7 +262,7 @@ export const processDocument = action({
       const chunks = chunkContent(
         extractedText.content,
         {
-          timestamps: extractedText.metadata.timestamps
+          timestamps: (extractedText.metadata as any).timestamps
         }
       )
 

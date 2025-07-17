@@ -2,7 +2,7 @@
 
 import { v } from "convex/values"
 import { action } from "../_generated/server"
-import { internal } from "../_generated/api"
+import { api, internal } from "../_generated/api"
 import { openai } from "@ai-sdk/openai"
 import { generateText } from "ai"
 
@@ -118,11 +118,11 @@ export const generatePodcast = action({
       // Combine chunks for script generation (limit for initial podcast)
       const contentForPodcast = chunks
         .slice(0, 8) // Use first 8 chunks for reasonable podcast length
-        .map(chunk => chunk.content)
+        .map((chunk: any) => chunk.content)
         .join("\n\n")
 
       // Get existing summary if available
-      const existingSummary = await ctx.runQuery(internal.generatedContent.getByDocumentAndType, {
+      const existingSummary = await ctx.runQuery(api.generatedContent.getByDocumentAndType, {
         documentId: args.documentId,
         type: "summary"
       })

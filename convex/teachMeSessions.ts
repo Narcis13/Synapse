@@ -16,9 +16,6 @@ export const create = internalMutation({
       currentTopic: args.currentTopic,
       weakAreas: [],
       createdAt: Date.now(),
-      metadata: {
-        personality: args.personality,
-      },
     })
   },
 })

@@ -15,10 +15,10 @@ export const createSession = mutation({
       throw new Error("Unauthenticated");
     }
 
-    // Get user from database
+    // Get user from database using email
     const user = await ctx.db
       .query("users")
-      .withIndex("by_clerkUserId", (q) => q.eq("clerkUserId", identity.subject))
+      .withIndex("by_email", (q) => q.eq("email", identity.email!))
       .unique();
     
     if (!user) {
@@ -58,7 +58,7 @@ export const getSession = query({
     // Verify session belongs to user
     const user = await ctx.db
       .query("users")
-      .withIndex("by_clerkUserId", (q) => q.eq("clerkUserId", identity.subject))
+      .withIndex("by_email", (q) => q.eq("email", identity.email!))
       .unique();
     
     if (!user || session.userId !== user._id) {
@@ -88,7 +88,7 @@ export const getSessionMessages = query({
 
     const user = await ctx.db
       .query("users")
-      .withIndex("by_clerkUserId", (q) => q.eq("clerkUserId", identity.subject))
+      .withIndex("by_email", (q) => q.eq("email", identity.email!))
       .unique();
     
     if (!user || session.userId !== user._id) {
@@ -117,7 +117,7 @@ export const getDocumentSessions = query({
 
     const user = await ctx.db
       .query("users")
-      .withIndex("by_clerkUserId", (q) => q.eq("clerkUserId", identity.subject))
+      .withIndex("by_email", (q) => q.eq("email", identity.email!))
       .unique();
     
     if (!user) {
@@ -202,16 +202,19 @@ export const searchRelevantChunks = internalQuery({
     limit: v.number(),
   },
   handler: async (ctx, args) => {
-    const results = await ctx.db
+    // Use vector search to find relevant chunks
+    const searchResults = await (ctx.db as any)
       .query("documentChunks")
-      .withSearchIndex("by_embedding", (q) =>
-        q.search("embedding", args.embedding).filter((q) =>
-          q.eq("documentId", args.documentId)
-        )
+      .withSearchIndex("by_embedding", (q: any) =>
+        q.search("embedding", args.embedding)
       )
+      .filter((q: any) => q.eq(q.field("documentId"), args.documentId))
       .take(args.limit);
 
-    return results;
+    return searchResults.map((result: any) => ({
+      ...result,
+      _score: result._score || 1
+    }));
   },
 });
 

@@ -1,3 +1,5 @@
+"use node";
+
 import { v } from "convex/values";
 import { action } from "../_generated/server";
 import { internal } from "../_generated/api";
@@ -15,7 +17,17 @@ export const chatWithDocument = action({
     sessionId: v.optional(v.id("chatSessions")),
     includeTimestamps: v.boolean(),
   },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args): Promise<{
+    messageId: Id<"chatMessages">;
+    content: string;
+    audioReferences: AudioReference[];
+    relevantChunks: Array<{
+      id: Id<"documentChunks">;
+      content: string;
+      metadata: any;
+      score: number;
+    }>;
+  }> => {
     // Get or create chat session
     let sessionId = args.sessionId;
     if (!sessionId) {
@@ -72,12 +84,12 @@ export const chatWithDocument = action({
       : [];
 
     // Store assistant message
-    const messageId = await ctx.runMutation(internal.chat.addMessage, {
+    const messageId: Id<"chatMessages"> = await ctx.runMutation(internal.chat.addMessage, {
       sessionId,
       role: "assistant",
       content: assistantResponse,
       metadata: {
-        chunkIds: relevantChunks.map(c => c._id),
+        chunkIds: relevantChunks.map((c: any) => c._id),
         audioReferences,
       },
     });
@@ -86,7 +98,7 @@ export const chatWithDocument = action({
       messageId,
       content: assistantResponse,
       audioReferences,
-      relevantChunks: relevantChunks.map(chunk => ({
+      relevantChunks: relevantChunks.map((chunk: any) => ({
         id: chunk._id,
         content: chunk.content.substring(0, 200) + "...",
         metadata: chunk.metadata,
@@ -144,7 +156,7 @@ This helps users navigate to the exact moment in the audio where the information
 function buildUserPrompt(
   message: string,
   context: string,
-  conversationHistory: any[]
+  conversationHistory: Array<{ role: string; content: string }>
 ): string {
   let prompt = `Previous conversation:\n`;
   
