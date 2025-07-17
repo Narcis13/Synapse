@@ -1,5 +1,5 @@
 import { v } from "convex/values"
-import { mutation, query } from "./_generated/server"
+import { mutation, query, internalQuery } from "./_generated/server"
 import { Doc, Id } from "./_generated/dataModel"
 
 // Update user subscription from Stripe webhook
@@ -9,7 +9,7 @@ export const updateSubscriptionFromStripe = mutation({
     subscriptionData: v.object({
       stripeSubscriptionId: v.string(),
       stripePriceId: v.string(),
-      status: v.union(v.literal("free"), v.literal("pro"), v.literal("canceled")),
+      status: v.union(v.literal("free"), v.literal("active"), v.literal("canceled")),
       currentPeriodEnd: v.number(),
     }),
   },
@@ -107,7 +107,7 @@ export const getSubscriptionStatus = query({
   },
 })
 
-// Check and update usage limits
+// Check usage limits (read-only)
 export const checkUsageLimits = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
@@ -116,7 +116,7 @@ export const checkUsageLimits = query({
       throw new Error("User not found")
     }
 
-    // Reset usage if it's a new month
+    // Check if usage needs reset
     const now = Date.now()
     const lastReset = new Date(user.usage.lastResetDate)
     const currentMonth = new Date(now).getMonth()
@@ -124,18 +124,7 @@ export const checkUsageLimits = query({
 
     const needsReset = currentMonth !== lastResetMonth
 
-    if (needsReset) {
-      await ctx.db.patch(args.userId, {
-        usage: {
-          documentsProcessed: 0,
-          audioMinutesProcessed: 0,
-          aiTokensUsed: 0,
-          lastResetDate: now,
-        },
-      })
-    }
-
-    const limits = user.subscription.status === "pro" 
+    const limits = user.subscription.status === "active" 
       ? {
           documents: Infinity,
           audioMinutes: Infinity,
@@ -149,18 +138,44 @@ export const checkUsageLimits = query({
           teachMeSessions: 3,
         }
 
+    // If needs reset, return zeroed usage
+    const usage = needsReset ? {
+      documentsProcessed: 0,
+      audioMinutesProcessed: 0,
+      aiTokensUsed: 0,
+    } : user.usage;
+
     return {
-      usage: needsReset ? {
+      usage,
+      limits,
+      needsReset,
+      canUploadDocument: usage.documentsProcessed < limits.documents,
+      canProcessAudio: usage.audioMinutesProcessed < limits.audioMinutes,
+      remainingDocuments: Math.max(0, limits.documents - usage.documentsProcessed),
+      remainingAudioMinutes: Math.max(0, limits.audioMinutes - usage.audioMinutesProcessed),
+    }
+  },
+})
+
+// Reset usage limits (mutation)
+export const resetUsageLimits = mutation({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.userId)
+    if (!user) {
+      throw new Error("User not found")
+    }
+
+    await ctx.db.patch(args.userId, {
+      usage: {
         documentsProcessed: 0,
         audioMinutesProcessed: 0,
         aiTokensUsed: 0,
-      } : user.usage,
-      limits,
-      canUploadDocument: user.usage.documentsProcessed < limits.documents,
-      canProcessAudio: user.usage.audioMinutesProcessed < limits.audioMinutes,
-      remainingDocuments: Math.max(0, limits.documents - user.usage.documentsProcessed),
-      remainingAudioMinutes: Math.max(0, limits.audioMinutes - user.usage.audioMinutesProcessed),
-    }
+        lastResetDate: Date.now(),
+      },
+    })
+
+    return { success: true }
   },
 })
 
@@ -188,5 +203,21 @@ export const incrementUsage = mutation({
     })
 
     return { success: true }
+  },
+})
+
+// Internal query to get current user
+export const getCurrentUser = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity()
+    if (!identity || !identity.email) {
+      return null
+    }
+
+    return await ctx.db
+      .query("users")
+      .withIndex("by_email", (q) => q.eq("email", identity.email))
+      .first()
   },
 })

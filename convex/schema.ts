@@ -8,10 +8,12 @@ export default defineSchema({
     name: v.string(),
     role: v.union(v.literal("student"), v.literal("instructor")),
     passwordHash: v.string(),
+    salt: v.string(),
+    lastLoginAt: v.optional(v.number()),
     subscription: v.object({
       status: v.union(
         v.literal("free"),
-        v.literal("pro"),
+        v.literal("active"),
         v.literal("canceled")
       ),
       stripeCustomerId: v.optional(v.string()),
@@ -38,6 +40,7 @@ export default defineSchema({
     status: v.union(
       v.literal("uploading"),
       v.literal("uploaded"),
+      v.literal("pending"),
       v.literal("processing"),
       v.literal("completed"),
       v.literal("failed")
@@ -61,6 +64,9 @@ export default defineSchema({
     transcript: v.optional(v.string()), // For audio files
     audioDuration: v.optional(v.number()), // in seconds
     error: v.optional(v.string()),
+    processingProgress: v.optional(v.number()), // 0-100
+    metadata: v.optional(v.any()), // Additional metadata from extraction
+    transcriptId: v.optional(v.id("_storage")), // For audio transcript storage
   }).index("by_user", ["userId"])
     .index("by_status", ["status"]),
 
@@ -133,12 +139,27 @@ export default defineSchema({
     userId: v.id("users"),
     documentId: v.id("documents"),
     createdAt: v.number(),
-  }).index("by_user", ["userId"]),
+    lastMessageAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_document", ["userId", "documentId"]),
 
   chatMessages: defineTable({
     sessionId: v.id("chatSessions"),
     role: v.union(v.literal("user"), v.literal("assistant")),
     content: v.string(),
     timestamp: v.number(),
+    metadata: v.optional(v.any()),
   }).index("by_session", ["sessionId"]),
+
+  usage: defineTable({
+    userId: v.id("users"),
+    documentsUploaded: v.number(),
+    quizzesGenerated: v.number(),
+    summariesGenerated: v.number(),
+    flashcardsGenerated: v.number(),
+    teachMeSessionsUsed: v.number(),
+    resetDate: v.number(),
+  })
+    .index("by_userId", ["userId"]),
 });

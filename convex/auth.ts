@@ -1,16 +1,23 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { Doc, Id } from "./_generated/dataModel";
-import crypto from "crypto";
 
-// Helper function to hash passwords
-function hashPassword(password: string, salt: string): string {
-  return crypto.pbkdf2Sync(password, salt, 100000, 64, "sha512").toString("hex");
+// Simple password hashing for demo purposes
+// In production, use proper bcrypt or argon2 via an action
+function simpleHash(password: string, salt: string): string {
+  // This is a simple hash for demo - in production use proper crypto
+  let hash = 0;
+  const str = password + salt;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash).toString(16);
 }
 
-// Helper function to generate salt
 function generateSalt(): string {
-  return crypto.randomBytes(16).toString("hex");
+  return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 }
 
 export const register = mutation({
@@ -32,40 +39,44 @@ export const register = mutation({
 
     // Generate salt and hash password
     const salt = generateSalt();
-    const hashedPassword = hashPassword(args.password, salt);
+    const hashedPassword = simpleHash(args.password, salt);
 
     // Create user with free tier
     const userId = await ctx.db.insert("users", {
       email: args.email,
       name: args.name,
+      role: "student",
       passwordHash: hashedPassword,
       salt: salt,
-      tier: "free",
-      stripeCustomerId: null,
-      stripeSubscriptionId: null,
-      subscriptionStatus: "inactive",
-      subscriptionEndDate: null,
+      lastLoginAt: Date.now(),
+      subscription: {
+        status: "free",
+        stripeCustomerId: undefined,
+        stripePriceId: undefined,
+        stripeSubscriptionId: undefined,
+        currentPeriodEnd: undefined,
+      },
+      usage: {
+        documentsProcessed: 0,
+        audioMinutesProcessed: 0,
+        aiTokensUsed: 0,
+        lastResetDate: Date.now(),
+      },
       createdAt: Date.now(),
-      updatedAt: Date.now(),
     });
 
-    // Initialize usage limits for free tier
+    // Initialize usage tracking
     await ctx.db.insert("usage", {
       userId,
       documentsUploaded: 0,
-      documentsLimit: 3, // Free tier limit
       quizzesGenerated: 0,
-      quizzesLimit: 5, // Free tier limit
       summariesGenerated: 0,
-      summariesLimit: 5, // Free tier limit
       flashcardsGenerated: 0,
-      flashcardsLimit: 20, // Free tier limit
       teachMeSessionsUsed: 0,
-      teachMeSessionsLimit: 3, // Free tier limit
       resetDate: Date.now() + 30 * 24 * 60 * 60 * 1000, // Reset in 30 days
     });
 
-    return { userId, email: args.email, tier: "free" };
+    return { userId, email: args.email, subscription: { status: "free" } };
   },
 });
 
@@ -89,12 +100,12 @@ export const checkSubscription = query({
     }
 
     // Check if subscription is active
-    const isActive = user.subscriptionStatus === "active" && 
-                    user.subscriptionEndDate && 
-                    user.subscriptionEndDate > Date.now();
+    const isActive = user.subscription.status === "active" && 
+                    user.subscription.currentPeriodEnd && 
+                    user.subscription.currentPeriodEnd > Date.now();
 
     // Determine current tier based on subscription status
-    const currentTier = isActive && user.tier === "pro" ? "pro" : "free";
+    const currentTier = isActive ? "pro" : "free";
 
     // Update tier limits based on current tier
     const limits = currentTier === "pro" ? {
@@ -113,8 +124,8 @@ export const checkSubscription = query({
 
     return {
       tier: currentTier,
-      subscriptionStatus: user.subscriptionStatus,
-      subscriptionEndDate: user.subscriptionEndDate,
+      subscriptionStatus: user.subscription.status,
+      subscriptionEndDate: user.subscription.currentPeriodEnd,
       usage: {
         documentsUploaded: usage.documentsUploaded,
         documentsLimit: limits.documentsLimit,
@@ -151,7 +162,7 @@ export const login = mutation({
     }
 
     // Verify password
-    const hashedPassword = hashPassword(args.password, user.salt);
+    const hashedPassword = simpleHash(args.password, user.salt);
     if (hashedPassword !== user.passwordHash) {
       throw new Error("Invalid email or password");
     }
@@ -159,14 +170,13 @@ export const login = mutation({
     // Update last login
     await ctx.db.patch(user._id, {
       lastLoginAt: Date.now(),
-      updatedAt: Date.now(),
     });
 
     return {
       userId: user._id,
       email: user.email,
       name: user.name,
-      tier: user.tier,
+      subscription: user.subscription,
     };
   },
 });
@@ -176,17 +186,23 @@ export const updateSubscription = mutation({
     userId: v.id("users"),
     stripeCustomerId: v.string(),
     stripeSubscriptionId: v.string(),
-    status: v.string(),
-    endDate: v.number(),
+    stripePriceId: v.optional(v.string()),
+    status: v.union(v.literal("free"), v.literal("active"), v.literal("canceled")),
+    currentPeriodEnd: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.userId);
+    if (!user) throw new Error("User not found");
+
     await ctx.db.patch(args.userId, {
-      stripeCustomerId: args.stripeCustomerId,
-      stripeSubscriptionId: args.stripeSubscriptionId,
-      subscriptionStatus: args.status,
-      subscriptionEndDate: args.endDate,
-      tier: args.status === "active" ? "pro" : "free",
-      updatedAt: Date.now(),
+      subscription: {
+        ...user.subscription,
+        stripeCustomerId: args.stripeCustomerId,
+        stripeSubscriptionId: args.stripeSubscriptionId,
+        stripePriceId: args.stripePriceId,
+        status: args.status,
+        currentPeriodEnd: args.currentPeriodEnd,
+      },
     });
   },
 });

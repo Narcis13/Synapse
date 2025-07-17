@@ -77,6 +77,7 @@
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=your_stripe_publishable
   STRIPE_WEBHOOK_SECRET=your_webhook_secret
   DEEPGRAM_API_KEY=your_deepgram_key
+  ELEVEN_LABS_API_KEY=your_elevenlabs_key
   ```
 
 - [x] **1.6 Setup folder structure**
@@ -481,7 +482,7 @@
 
 ### Day 4: Document & Audio Processing
 
-- [ ] **4.1 Setup audio transcription with Deepgram**
+- [x] **4.1 Setup audio transcription with Deepgram**
   ```typescript
   // src/lib/ai/transcription.ts
   import { Deepgram } from '@deepgram/sdk'
@@ -496,7 +497,7 @@
   }
   ```
 
-- [ ] **4.2 Enhance text extraction for all formats**
+- [x] **4.2 Enhance text extraction for all formats**
   ```typescript
   // src/lib/ai/extractors.ts
   - extractTextFromPDF() with better formatting
@@ -505,7 +506,7 @@
   - extractTextFromTxt()
   ```
 
-- [ ] **4.3 Implement smart chunking with timestamps**
+- [x] **4.3 Implement smart chunking with timestamps**
   ```typescript
   // src/lib/ai/chunking.ts
   export function chunkContent(
@@ -518,7 +519,7 @@
   }
   ```
 
-- [ ] **4.4 Create unified processing action**
+- [x] **4.4 Create unified processing action**
   ```typescript
   // convex/actions/processDocument.ts
   export const processDocument = action({
@@ -535,7 +536,7 @@
 
 ### Day 5: Enhanced AI Generation with "Teach Me" Scripts
 
-- [ ] **5.1 Create AI generation service**
+- [x] **5.1 Create AI generation service**
   ```typescript
   // src/lib/ai/generation.ts
   import { openai } from '@ai-sdk/openai'
@@ -548,7 +549,7 @@
   }
   ```
 
-- [ ] **5.2 Implement "Teach Me" script generation**
+- [x] **5.2 Implement "Teach Me" script generation**
   ```typescript
   // convex/actions/generateTeachMe.ts
   export const generateTeachMeScript = action({
@@ -563,7 +564,7 @@
   })
   ```
 
-- [ ] **5.3 Enhanced quiz generation with audio support**
+- [x] **5.3 Enhanced quiz generation with audio support**
   ```typescript
   // convex/actions/generateQuiz.ts
   - Include timestamp-based questions for audio
@@ -572,7 +573,7 @@
   - Difficulty adaptation
   ```
 
-- [ ] **5.4 AI podcast generation**
+- [x] **5.4 AI podcast generation**
   ```typescript
   // convex/actions/generatePodcast.ts
   export const generatePodcast = action({
@@ -591,7 +592,7 @@
 
 ### Day 6: "Teach Me" Mode Implementation
 
-- [ ] **6.1 Create Teach Me interface**
+- [x] **6.1 Create Teach Me interface**
   ```typescript
   // src/components/teach-me/TeachMeInterface.tsx
   import { Card } from "@/components/ui/card"
@@ -607,7 +608,7 @@
   }
   ```
 
-- [ ] **6.2 Implement AI student personalities**
+- [x] **6.2 Implement AI student personalities**
   ```typescript
   // src/lib/ai/personalities.ts
   export const aiStudentPersonalities = {
@@ -632,7 +633,7 @@
   }
   ```
 
-- [ ] **6.3 Real-time teaching evaluation**
+- [x] **6.3 Real-time teaching evaluation**
   ```typescript
   // convex/actions/evaluateTeaching.ts
   export const evaluateExplanation = action({
@@ -651,7 +652,7 @@
   })
   ```
 
-- [ ] **6.4 Create feedback dashboard**
+- [x] **6.4 Create feedback dashboard**
   ```typescript
   // src/components/teach-me/FeedbackPanel.tsx
   import { Progress } from "@/components/ui/progress"
@@ -666,7 +667,7 @@
 
 ### Day 7: Advanced Chat with Audio Context
 
-- [ ] **7.1 Build enhanced chat interface**
+- [x] **7.1 Build enhanced chat interface**
   ```typescript
   // src/components/learning/EnhancedChat.tsx
   import { ScrollArea } from "@/components/ui/scroll-area"
@@ -679,7 +680,7 @@
   - Voice input option
   ```
 
-- [ ] **7.2 Implement audio-aware RAG**
+- [x] **7.2 Implement audio-aware RAG**
   ```typescript
   // convex/actions/chatWithAudio.ts
   export const chatWithDocument = action({
@@ -697,7 +698,7 @@
   })
   ```
 
-- [ ] **7.3 Add audio playback integration**
+- [x] **7.3 Add audio playback integration**
   ```typescript
   // src/components/audio/AudioPlayer.tsx
   import WaveSurfer from 'wavesurfer.js'
@@ -709,7 +710,7 @@
   - Bookmark important moments
   ```
 
-- [ ] **7.4 Create citation component**
+- [x] **7.4 Create citation component**
   ```typescript
   // src/components/learning/Citation.tsx
   import { HoverCard } from "@/components/ui/hover-card"
@@ -726,7 +727,7 @@
 
 ### Day 8: Student Dashboard with Complete UI
 
-- [ ] **8.1 Create main dashboard layout**
+- [x] **8.1 Create main dashboard layout**
   ```typescript
   // src/app/(dashboard)/layout.tsx
   import { Tabs } from "@/components/ui/tabs"
@@ -740,7 +741,7 @@
   - Notification bell
   ```
 
-- [ ] **8.2 Build comprehensive learning home**
+- [x] **8.2 Build comprehensive learning home**
   ```typescript
   // src/app/(dashboard)/learn/page.tsx
   import { Card } from "@/components/ui/card"
@@ -757,7 +758,7 @@
   - Continue where you left off
   ```
 
-- [ ] **8.3 Document detail page with tabs**
+- [x] **8.3 Document detail page with tabs**
   ```typescript
   // src/app/(dashboard)/learn/[id]/page.tsx
   import { Tabs, TabsContent } from "@/components/ui/tabs"
@@ -770,7 +771,7 @@
   - Audio/Podcast tab
   ```
 
-- [ ] **8.4 Usage analytics component**
+- [x] **8.4 Usage analytics component**
   ```typescript
   // src/components/analytics/UsageChart.tsx
   - Daily study time chart
@@ -781,7 +782,7 @@
 
 ### Day 9: Interactive Learning Components
 
-- [ ] **9.1 Enhanced quiz interface**
+- [x] **9.1 Enhanced quiz interface**
   ```typescript
   // src/components/learning/QuizInterface.tsx
   import { RadioGroup } from "@/components/ui/radio-group"
@@ -795,7 +796,7 @@
   - Retake with new questions
   ```
 
-- [ ] **9.2 Advanced flashcard system**
+- [x] **9.2 Advanced flashcard system**
   ```typescript
   // src/components/learning/FlashcardDeck.tsx
   import { Card } from "@/components/ui/card"
@@ -808,7 +809,7 @@
   - Progress persistence
   ```
 
-- [ ] **9.3 Teach Me session manager**
+- [x] **9.3 Teach Me session manager**
   ```typescript
   // src/components/teach-me/SessionManager.tsx
   import { Select } from "@/components/ui/select"
@@ -820,7 +821,7 @@
   - Performance review
   ```
 
-- [ ] **9.4 Audio learning features**
+- [x] **9.4 Audio learning features**
   ```typescript
   // src/components/audio/AudioLearning.tsx
   - Playback speed control
